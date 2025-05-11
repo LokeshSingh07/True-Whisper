@@ -88,6 +88,7 @@ export default function Component() {
     }
     catch(err){
       // console.error("Error in signup of user", err)
+      // @ts-ignore
       toast(err?.response?.data?.message || "Error in signup of user")
       setIsSubmitting(false)
     }
