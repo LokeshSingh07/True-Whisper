@@ -31,9 +31,9 @@ export const authOptions: NextAuthOptions = {
                     const user = await UserModel.findOne({
                         $or: [
                             // @ts-ignore
-                            {email: credentials?.identifier},
+                            {email: credentials?.identifier.toLowerCase()},
                             // @ts-ignore
-                            {username: credentials?.identifier},
+                            {username: credentials?.identifier.toLowerCase()},
                         ]
                     })
 

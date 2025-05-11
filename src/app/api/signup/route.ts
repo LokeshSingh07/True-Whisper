@@ -11,7 +11,7 @@ export async function POST(req:Request){
         const {username, email, password} = await req.json();
 
         const existingUserVerifiedByUsername = await UserModel.findOne({
-            username,
+            username: username.toLowerCase(),
             isVerified: true
         })
 

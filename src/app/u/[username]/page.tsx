@@ -86,9 +86,9 @@ const Page = () => {
 
   return (
     <div className='w-full '>
-      <div className='max-w-4xl mx-auto'>     
+      <div className='max-w-4xl mx-auto px-4'>     
         <div className='min-h-[40vh]'>
-          <p className='text-center text-3xl font-bold mt-10'>Public profile Link</p>
+          <p className='text-center text-3xl font-bold my-10'>Public profile Link</p>
           
           {/* <p>Send Anonymous Message @{username}</p> */}
           {/* form */}
@@ -101,7 +101,7 @@ const Page = () => {
                   <FormItem>
                     <FormLabel>Send Anonymous Message @{username}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Enter you message" rows={5} {...field}/>
+                      <Textarea placeholder="Enter you message" className='h-32 resize-none' {...field}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -125,7 +125,7 @@ const Page = () => {
         </div>
 
         {/* suggest msg -> AI */}
-        <div className='flex flex-col gap-4'>
+        <div className='flex flex-col gap-4 mt-10'>
           <Button onClick={handleSuggestMessage} className='w-fit'>
             Suggest Message
           </Button>

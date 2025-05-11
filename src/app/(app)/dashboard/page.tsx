@@ -127,23 +127,23 @@ const Dashboard = () => {
 
   if(!session || !session.user){
     return (
-      <p>User is not Authenticated</p>
+      <p>No content found</p>
     )
   }
 
 
   return (
-    <div className='my-8 mx-4 md:mx-8 lg:mx-auto rounded w-full max-w-6xl'>
+    <div className='my-8 px-4 lg:mx-auto rounded w-full max-w-6xl'>
       <h1 className='text-4xl font-bold mb-4'>User Dashboard</h1>
       
-      <div className='mb-4'>
+      <div className='w-full mb-4'>
         <h2 className='text-lg font-semibold mb-2'>Copy your Unique Link</h2>
-        <div className='flex items-center'>
+        <div className='flex items-center justify-between w-full'>
           <input 
             type='text'
             value={profileUrl}
             disabled
-            className='input input-bordered w-full p-2 mr-2'
+            className='input input-bordered w-full'
           />
           <Button onClick={copyToClipboard} className=''><Copy/></Button>
         </div>
