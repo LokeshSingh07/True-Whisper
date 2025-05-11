@@ -48,7 +48,7 @@ export async function POST(req: Request){
         },{status: 200})
     }
     catch(err){
-        console.error("Error while verifying the code", err);
+        // console.error("Error while verifying the code", err);
         return Response.json({
             success: false,
             message: "Error while verifying the code"

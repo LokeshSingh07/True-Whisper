@@ -47,7 +47,7 @@ export async function GET(req:Request){
 
     }
     catch(err){
-        console.log("An unexpected error", err)
+        // console.log("An unexpected error", err)
         return Response.json({
             success: false,
             message: "Internal server error",

@@ -27,7 +27,7 @@ const Features = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">How It Works</h2>
           <p className="text-gray-300 max-w-2xl mx-auto">
-            EchoVoice makes it simple to gather anonymous feedback from anyone in your network.
+            TrueWhisper makes it simple to gather anonymous feedback from anyone in your network.
           </p>
         </div>
         

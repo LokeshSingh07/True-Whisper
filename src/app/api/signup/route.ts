@@ -76,7 +76,7 @@ export async function POST(req:Request){
             email, username, verifyCode
         )
 
-        console.log("Email response : ", emailResponse);
+        // console.log("Email response : ", emailResponse);
 
         if(!emailResponse.success){
             return Response.json({
@@ -93,7 +93,7 @@ export async function POST(req:Request){
         },{status: 200})
     }
     catch(err){
-        console.error("Error registering user", err);
+        // console.error("Error registering user", err);
         return Response.json({
             success: false,
             message: "Error registering user"

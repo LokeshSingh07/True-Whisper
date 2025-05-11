@@ -42,7 +42,7 @@ export async function POST(req:Request){
         },{status: 201})
     }
     catch(err){
-        console.log("Failed to updated user status to accppt messages");
+        // console.log("Failed to updated user status to accppt messages");
         return Response.json({
             success: false,
             message: "Internal server error"
@@ -84,7 +84,7 @@ export async function GET(req: Request){
         },{status: 200})
     }
     catch(err){
-        console.log("Error in getting message accptance status ", err)
+        // console.log("Error in getting message accptance status ", err)
         return Response.json({
             success: false,
             message: "Internal server error",

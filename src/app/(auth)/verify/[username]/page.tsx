@@ -53,7 +53,7 @@ export default function VerifyAccount(){
 
     }
     catch(err){
-      console.error("Error resending code:", err);
+      // console.error("Error resending code:", err);
       toast("Failed to resend code.");
     }
   }
@@ -62,7 +62,7 @@ export default function VerifyAccount(){
   const onSubmit = async(data: z.infer<typeof verifySchema>)=>{
     setIsVerifying(true);
     try{
-      console.log("data : ", data);
+      // console.log("data : ", data);
       const response = await axios.post(`/api/verify-code`, {
         username: params.username,
         code: data.code
@@ -72,7 +72,7 @@ export default function VerifyAccount(){
       router.replace(`/signin`)
     }
     catch(err){
-      console.log("Error in signup of user ", err)
+      // console.log("Error in signup of user ", err)
       // err?.response?.data?.message 
       const errorMessage = "Signup failed";
       toast(errorMessage)

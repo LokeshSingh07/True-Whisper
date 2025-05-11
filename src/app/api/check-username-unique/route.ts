@@ -22,7 +22,7 @@ export async function GET(req: Request){
 
         // validate with zod
         const result = UsernameQuerySchema.safeParse(queryParam);
-        console.log("zod result : ", result);
+        // console.log("zod result : ", result);
 
         if(!result.success){
             const usernameError = result.error.format().username?._errors || []
@@ -36,7 +36,7 @@ export async function GET(req: Request){
 
         const existingVerifiedUser = await UserModel.findOne({username, isVerified: true})
     
-        console.log("existingVerifiedUser: ", existingVerifiedUser);
+        // console.log("existingVerifiedUser: ", existingVerifiedUser);
         if(existingVerifiedUser){
             return Response.json({
                 success: false,
@@ -52,7 +52,7 @@ export async function GET(req: Request){
 
     }
     catch(err){
-        console.error("Error checking username", err);
+        // console.error("Error checking username", err);
         return Response.json({
             success: false,
             message: "Error checking username"

@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         return result.toDataStreamResponse();
     }
     catch(err){
-        console.error("an unexpected error occurred ", err);
+        // console.error("an unexpected error occurred ", err);
         return new Response(
             JSON.stringify({
                 error: 'Internal Server Error'
