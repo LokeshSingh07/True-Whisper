@@ -10,7 +10,7 @@ export async function POST(req: Request){
         const decodededUsername = decodeURIComponent(username)
         
         const user = await UserModel.findOne({
-            username: decodededUsername,
+            username: decodededUsername.toLowerCase(),
         })
 
         if(!user){

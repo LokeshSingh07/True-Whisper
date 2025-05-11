@@ -11,16 +11,17 @@ export async function sendVerificationEmail(
 
     try{
         const { data, error } = await resend.emails.send({
-            from: 'Acme <onboarding@resend.dev>',
+            from: 'no-reply@codewithlokesh.com',
             to: email,
-            subject: 'Mystry message | Verification code',
+            subject: 'True Whisper message | Verification code',
             react: VerificationEmail({username, verifyCode}),
         });
 
+        // console.log("resend error: ", error);
         if (error) {
             return {
                 success: false,
-                message: "Failed to send verifiation email"
+                message: "Failed to send verification email"
             }
         }
 
@@ -33,7 +34,7 @@ export async function sendVerificationEmail(
         console.error("Error sending verification Email", emailError);
         return {
             success: false,
-            message: "Failed to send verifiation email"
+            message: "Internal server error, Resend"
         }
     }
 }

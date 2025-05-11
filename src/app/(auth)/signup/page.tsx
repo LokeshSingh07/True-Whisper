@@ -80,15 +80,15 @@ export default function Component() {
   const onSubmit = async(data: z.infer<typeof signupSchema>)=>{
     setIsSubmitting(true);
     try{
-      console.log("Data : ", data);
+      // console.log("Data : ", data);
       const response = await axios.post<ApiResponse>('/api/signup', data)
-      toast.success(response.data.message || "success")
+      toast.success(response.data.message || "verify you email to create an account")
       router.replace(`/verify/${username}`)
       setIsSubmitting(false)
     }
     catch(err){
-      console.error("Error in signup of user ", err)
-      // toast(err.response.data.message || "error")
+      // console.error("Error in signup of user", err)
+      toast(err?.response?.data?.message || "Error in signup of user")
       setIsSubmitting(false)
     }
   }

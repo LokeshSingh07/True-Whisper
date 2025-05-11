@@ -38,7 +38,7 @@ export async function POST(req:Request){
                 const hashedPassword = await bcrypt.hash(password, 10);
 
                 const updatedUser = await UserModel.findOneAndUpdate(
-                    {email},
+                    {email: email.toLowerCase(),},
                     {
                         $set: {
                             password: hashedPassword,
@@ -56,8 +56,8 @@ export async function POST(req:Request){
             expiryDate.setHours(expiryDate.getHours() + 1)
 
             const newUser = new UserModel({
-                username,
-                email,
+                username: username.toLowerCase(),
+                email: email.toLowerCase(),
                 password: hashedPassword,
                 verfiyCode: verifyCode,
                 verfiyCodeExpiry: expiryDate,
@@ -82,14 +82,14 @@ export async function POST(req:Request){
             return Response.json({
                 success: false,
                 message: emailResponse.message
-            },{status: 500})
+            },{status: 400})
         }
         
 
 
         return Response.json({
             success: true,
-            message: "userr registered successfully. Please verify your email"
+            message: "user registered successfully. Please verify your email"
         },{status: 200})
     }
     catch(err){
