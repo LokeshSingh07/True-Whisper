@@ -36,7 +36,7 @@ const Navbar = () => {
                   }}
                 >Dashboard</Button>)
               }
-              <Button className='w-fit mx:w-auto rounded-full' 
+              <Button className='w-fit mx:w-auto px-5 rounded-full' 
                 onClick={()=> {
                   signOut()
                   router.push("/")

@@ -4,6 +4,8 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface Message extends Document{
     content: string;
     createdAt: Date;
+    read: boolean;
+    starred: boolean;
 }
 const MessageSchema: Schema<Message> = new Schema({
     content: {
@@ -12,9 +14,17 @@ const MessageSchema: Schema<Message> = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now(),
+        default: Date.now,
         required: true,
-    }
+    },
+    read: {
+        type: Boolean,
+        default: false,
+    },
+    starred: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 

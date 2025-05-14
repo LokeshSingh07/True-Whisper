@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isSwitchLoading, setIsSwitchloading] = useState<boolean>(false);
+  const [filter, setFilter] = useState<'all' | 'read' | 'unread'>('all');
   const {data: session} = useSession();
   const {username} = session?.user as User || "";
   const router  = useRouter();
@@ -107,10 +108,23 @@ const Dashboard = () => {
   }
   
   const handleDeleteMessage = (messageId: string)=>{
-    // TODO :api
 
     setMessages(messages.filter((message) => message._id != messageId))
   }
+
+  const handleMessageRead = (messageId: string) => {
+    // @ts-ignore
+    setMessages(prevMessages => {
+      const updated = prevMessages.map(message =>
+        message._id === messageId
+          ? { ...message, read: true }
+          : message
+      );
+      console.log("updated : ", updated);
+      return updated;
+    });
+  };
+  
 
 
 
@@ -131,33 +145,44 @@ const Dashboard = () => {
     )
   }
 
+  
+  // Filter messages only once before mapping them
+  const filteredMessages = messages.filter((msg) => {
+    if (filter === 'read') return msg.read === true;
+    if (filter === 'unread') return msg.read === false;
+    return true;
+  });
+
 
   return (
     <div className='my-8 px-4 lg:mx-auto rounded w-full max-w-6xl'>
-      <h1 className='text-4xl font-bold mb-4'>User Dashboard</h1>
+      {/* <h1 className='text-4xl font-bold mb-4'>User Dashboard</h1> */}
       
-      <div className='w-full mb-4'>
-        <h2 className='text-lg font-semibold mb-2'>Copy your Unique Link</h2>
-        <div className='flex items-center justify-between w-full'>
+      <div className='w-full mb-6'>
+        <h2 className="text-xl font-semibold mb-2">Your Unique Message Link</h2>
+        <div className='flex items-center justify-between w-full gap-2'>
           <input 
             type='text'
             value={profileUrl}
             disabled
             className='input input-bordered w-full'
           />
-          <Button onClick={copyToClipboard} className=''><Copy/></Button>
+          <Button onClick={copyToClipboard} variant={"secondary"} size="icon" title="Copy Link"><Copy/></Button>
         </div>
+        <p className="text-sm text-muted-foreground mt-1">
+          Share this link with others so they can send you anonymous messages.
+        </p>
       </div>
 
-      <div className='mb-4'>
+      <div className='mb-6 flex items-center'>
         <Switch
           {...register('acceptMessage')}
           checked={acceptMessage}
           onCheckedChange={handleSwitchChange}
           disabled={isSwitchLoading}
         />
-        <span className='ml-2'>
-          Accept Messages: {acceptMessage ? 'On' : 'Off'}
+        <span className="ml-2 text-base">
+          Accepting messages is <strong>{acceptMessage ? 'enabled' : 'disabled'}</strong>
         </span>
       </div>
 
@@ -169,6 +194,7 @@ const Dashboard = () => {
           e.preventDefault()
           fetchMessages(true)
         }}
+        variant={"secondary"}
       >
         {
           loading ? 
@@ -177,19 +203,43 @@ const Dashboard = () => {
         }
       </Button>
 
-      <div className='mt-4 grid grid-cols-1 md:grid-cols-2 gap-6'>
+      {/* 🆕 Filter Buttons */}
+      <div className='mt-6 flex gap-2 items-center'>
+        <Button
+          variant={filter === 'all' ? 'default' : 'secondary'}
+          onClick={() => setFilter('all')}
+        >
+          All
+        </Button>
+        <Button
+          variant={filter === 'read' ? 'default' : 'secondary'}
+          onClick={() => setFilter('read')}
+        >
+          Read
+        </Button>
+        <Button
+          variant={filter === 'unread' ? 'default' : 'secondary'}
+          onClick={() => setFilter('unread')}
+        >
+          Unread
+        </Button>
+      </div>
+
+      <div className='mt-10 grid grid-cols-1 md:grid-cols-2 gap-6'>
         {
-          messages.length > 0 ? (
-            messages.map((msg, idx)=> (
+          filteredMessages.length > 0 
+          ? (
+            filteredMessages.map((msg, idx)=> (
               <MessageCard
-                key={idx}
+                key={msg._id as string}
                 message={msg}
                 onMessageDelete={handleDeleteMessage}
+                onMessageRead={handleMessageRead}
               />
             ))
           ) : 
           (
-            <p>No message to display.</p>
+            <p className="text-muted-foreground">No messages to display yet.</p>
           )
         }
       </div>

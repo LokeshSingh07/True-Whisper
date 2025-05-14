@@ -27,8 +27,11 @@ export async function POST(req: Request){
 
         const newMessage = {
             content,
-            createdAt: new Date()
+            createdAt: new Date(),
+            read: false,
+            starred: false,
         }
+        // console.log("new msg : ", newMessage);
 
         user.messages.push(newMessage as Message);
         await user.save();
