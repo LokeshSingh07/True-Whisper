@@ -100,9 +100,9 @@ export default function Component() {
       <div className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
-            Join TrueWhisper
+            Create Your Account
           </h1>
-          <p className="mb-4">Sign up to start your anonymous adventure</p>
+          <p className="mb-4">Join to start your anonymous messages.</p>
         </div>
       
 
@@ -115,7 +115,7 @@ export default function Component() {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter username" 
+                    <Input placeholder="Choose a unique username" 
                       {...field}
                       onChange={(e)=> {
                         field.onChange(e)
@@ -125,7 +125,7 @@ export default function Component() {
                   </FormControl>
                   <FormDescription>
                     {isCheckingUsername && debounced.length > 2
-                      ? "Checking username..." 
+                      ? "Checking availability..." 
                       : usernameMessage && <span className={`${usernameMessage != "username is available" ? "text-red-500" : "text-green-500"}`}>{usernameMessage}</span>}
                   </FormDescription>
                   <FormMessage />
@@ -140,7 +140,7 @@ export default function Component() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter you email" {...field}/>
+                    <Input placeholder="Enter your email address" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,7 +154,7 @@ export default function Component() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="******" type="password" {...field}/>
+                    <Input placeholder="Create a secure password" type="password" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -165,9 +165,9 @@ export default function Component() {
               {
                 isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Creating your account...
                   </>
-                ) : ("SignUp")
+                ) : ("Sign Up")
               }
             </Button>
           </form>

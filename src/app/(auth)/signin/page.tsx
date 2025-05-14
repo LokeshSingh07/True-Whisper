@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { 
   Form, 
   FormControl,
+  FormDescription,
   FormField, 
   FormItem, 
   FormLabel,
@@ -78,7 +79,7 @@ export default function Component() {
           <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
             Join TrueWhisper
           </h1>
-          <p className="mb-4">Sign in to start your anonymous adventure</p>
+          <p className="mb-4">Sign in to start your anonymous messages.</p>
         </div>
       
 
@@ -91,7 +92,7 @@ export default function Component() {
                 <FormItem>
                   <FormLabel>Email or Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter you email" {...field}/>
+                    <Input placeholder="Enter you email or username" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,8 +106,11 @@ export default function Component() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="******" type="password" {...field}/>
+                    <Input placeholder="Enter your password" type="password" {...field}/>
                   </FormControl>
+                  <FormDescription className="text-xs text-muted-foreground mt-1">
+                    Must be at least 6 characters.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -116,9 +120,9 @@ export default function Component() {
               {
                 isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Please wait
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Signing in...
                   </>
-                ) : ("Signin")
+                ) : ("Sign In")
               }
             </Button>
           </form>
@@ -127,7 +131,7 @@ export default function Component() {
         <p className="mt-8 text-sm text-muted-foreground text-center">
           Don&apos;t Have an account? 
           <Link href={"/signup"} className='w-full mx:w-auto ml-2 text-[#775AE9] hover:underline'>
-            Sign up
+            Create one
           </Link>
         </p>
 
