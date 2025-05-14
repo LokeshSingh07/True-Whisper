@@ -77,7 +77,7 @@ export default function Component() {
       <div className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
-            Join TrueWhisper
+            Welcome to TrueWhisper
           </h1>
           <p className="mb-4">Sign in to start your anonymous messages.</p>
         </div>
@@ -92,7 +92,7 @@ export default function Component() {
                 <FormItem>
                   <FormLabel>Email or Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter you email or username" {...field}/>
+                    <Input placeholder="Enter your email or username" {...field}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
