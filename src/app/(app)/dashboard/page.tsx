@@ -120,7 +120,7 @@ const Dashboard = () => {
           ? { ...message, read: true }
           : message
       );
-      console.log("updated : ", updated);
+      // console.log("updated : ", updated);
       return updated;
     });
   };

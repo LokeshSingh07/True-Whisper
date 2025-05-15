@@ -14,20 +14,38 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { z } from "zod"
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkle } from 'lucide-react';
 import { ApiResponse } from '@/types/ApiResponse';
 import { toast } from 'sonner';
 import axios, { AxiosError } from 'axios';
 import { Textarea } from '@/components/ui/textarea';
+import { useCompletion } from '@ai-sdk/react'
 
+
+const specialChar = "||";
+const initialMessageString = "What recent experience taught you something valuable?||If you could meet any influential person, past or present, who would it be?||What motivates you to keep improving each day?";
+const parseStringMessages = (messageString: string): string[] => {
+  return messageString.split(specialChar);
+};
 
 
 const Page = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false)
+  const [suggestions, setSuggestions] = useState<string[]>(parseStringMessages(initialMessageString));
   const params = useParams();
   const username = params.username;
     
+  const {
+    complete,
+    completion,
+    isLoading: isSuggestLoading,
+    error,
+  } = useCompletion({
+    api: "/api/suggest-messages",
+    initialCompletion: initialMessageString,
+  });
+
 
 
 
@@ -40,6 +58,7 @@ const Page = () => {
     }
   })
 
+  const messageContent = register.watch("content");
 
   const onSubmit = async(data: z.infer<typeof messageSchema>)=>{
     setIsSubmitting(true);
@@ -50,11 +69,11 @@ const Page = () => {
       })
       
       // console.log("response: ", response)
-      toast.success("Message submitted anonymously");
+      toast.success("Your message has been submitted anonymously.");
     }
     catch(err){
       const axiosError = err as AxiosError<ApiResponse>
-      toast(axiosError.response?.data.message || "Something went wrong");
+      toast(axiosError.response?.data.message || "An unexpected error occurred.");
     }
     finally{
       setIsSubmitting(false);
@@ -65,17 +84,20 @@ const Page = () => {
 
 
 
-  const handleSuggestMessage = ()=>{
-    const samples = [
-      "You're doing a great job—keep going!",
-      "Your leadership is truly inspiring.",
-      "Try being a little more approachable in team meetings.",
-      "Your work ethic sets a strong example!",
-      "Could we maybe improve communication during projects?"
-    ];
-
-    const random = samples.sort(()=> 0.5-Math.random()).slice(0,3);
-    setSuggestions(random);
+  const handleSuggestMessage = async()=>{
+    setLoading(true)
+    try{
+      const result = await complete("");
+      // console.log("result : ", result);
+      // @ts-ignore
+      setSuggestions(parseStringMessages(result)); 
+    }
+    catch(err){
+      toast("Unable to generate suggestions at the moment. Please try again.");
+    }
+    finally{
+      setLoading(false);
+    }
   }
 
   
@@ -88,7 +110,7 @@ const Page = () => {
     <div className='w-full '>
       <div className='max-w-4xl mx-auto px-4'>     
         <div className='min-h-[40vh]'>
-          <p className='text-center text-3xl font-bold my-10'>Public profile Link</p>
+          <p className='text-center text-3xl font-bold my-10'>Send an Anonymous Message</p>
           
           {/* <p>Send Anonymous Message @{username}</p> */}
           {/* form */}
@@ -99,9 +121,9 @@ const Page = () => {
                 control={register.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Send Anonymous Message @{username}</FormLabel>
+                    <FormLabel>Message to @{username}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Enter you message" className='h-32 resize-none' {...field}/>
+                      <Textarea placeholder="Write your message here..." className='h-32 resize-none' {...field}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -114,7 +136,7 @@ const Page = () => {
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin"/> Sending...
                     </>
-                  ) : ("Send it")
+                  ) : ("Send Message")
                 }
               </Button>
             </form>
@@ -125,27 +147,42 @@ const Page = () => {
         </div>
 
         {/* suggest msg -> AI */}
-        <div className='flex flex-col gap-4 mt-10'>
-          <Button onClick={handleSuggestMessage} className='w-fit'>
-            Suggest Message
+        <div className='flex flex-col gap-4 mt-14'>
+          <Button onClick={()=> handleSuggestMessage()} className='w-fit' disabled={isSuggestLoading}>
+            {isSuggestLoading 
+            ? (<>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) 
+            : (<>
+                <Sparkle/> Generate Suggestions
+            </>)}
           </Button>
 
-          <p>Click on any message below to select it</p>
+          <p className='text-muted-foreground'>Select a suggested message to use it instantly</p>
 
-          <div className="flex flex-col border p-4">
-            <p className='text-lg font-semibold'>Messages</p>
+          <div className="w-full flex flex-col border p-4 rounded-md shadow-sm">
+            <p className='text-lg font-semibold mb-2'>Suggested Messages</p>
 
-            {
-              suggestions.length > 0 ? 
-              (<div className='grid sm:grid-cols-2 gap-2'>
-                {
-                  suggestions.map((suggestion, idx)=>(
-                    <p key={idx} onClick={()=> handleClickSuggestion(suggestion)}>{suggestion}</p>
+            <div className='w-full'>
+              {
+                error 
+                ? ( <p className="text-red-500">{error.message}</p>) 
+                : (
+                  suggestions.map((message, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      className="mb-2 text-left justify-start whitespace-normal"
+                      onClick={() => handleClickSuggestion(message)}
+                    >
+                      {message}
+                    </Button>
                   ))
-                }
-              </div>) : 
-              (<div>No suggestion yet.</div>)      
-            }
+                )
+              }
+            </div> 
           </div>  
         </div>   
         
