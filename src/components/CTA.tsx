@@ -1,30 +1,92 @@
-import React from 'react';
-import { Button } from "@/components/ui/button";
+'use client'
 
+import React, { useEffect, useRef, useState } from 'react';
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const CTA = () => {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const node = panelRef.current;
+    if (!node) return;
+
+    // If the browser can't observe, or the user prefers less motion, just show it.
+    if (
+      typeof IntersectionObserver === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(node);
+        }
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="py-20 px-6 sm:px-8 bg-gradient-purple relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiI+PC9wYXRoPjwvZz48L2c+PC9zdmc+')] opacity-10"></div>
-      
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        <div>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-white">Ready to gather 
-            <span className='text-purple-400'> honest feedback?</span>
-          </h2>
-        </div>
-        
-        <div>
-          <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-            Create your anonymous feedback page in seconds and start collecting valuable insights.
+    <section className="py-24 px-6 sm:px-8 bg-background border-t border-border/15">
+      <div className="max-w-4xl mx-auto">
+        <div
+          ref={panelRef}
+          className={`relative border border-border/40 p-10 sm:p-14 text-center transition-all duration-700 ease-out ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+          }`}
+        >
+          {/* corner marks — stamp in one at a time once the panel is visible */}
+          <span
+            className={`absolute top-0 left-0 h-4 w-4 border-t-2 border-l-2 border-muted-foreground origin-top-left transition-transform duration-300 ${
+              isVisible ? "scale-100" : "scale-0"
+            }`}
+            style={{ transitionDelay: isVisible ? "300ms" : "0ms" }}
+          />
+          <span
+            className={`absolute top-0 right-0 h-4 w-4 border-t-2 border-r-2 border-muted-foreground origin-top-right transition-transform duration-300 ${
+              isVisible ? "scale-100" : "scale-0"
+            }`}
+            style={{ transitionDelay: isVisible ? "380ms" : "0ms" }}
+          />
+          <span
+            className={`absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2 border-muted-foreground origin-bottom-left transition-transform duration-300 ${
+              isVisible ? "scale-100" : "scale-0"
+            }`}
+            style={{ transitionDelay: isVisible ? "460ms" : "0ms" }}
+          />
+          <span
+            className={`absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-muted-foreground origin-bottom-right transition-transform duration-300 ${
+              isVisible ? "scale-100" : "scale-0"
+            }`}
+            style={{ transitionDelay: isVisible ? "540ms" : "0ms" }}
+          />
+
+          <p className="font-mono text-[11px] tracking-[0.25em] text-muted-foreground uppercase mb-4">
+            Ready when you are
           </p>
-        </div>
-        
-        <div>
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground font-mono mb-5">
+            Open your drop box
+          </h2>
+          <p className="text-muted-foreground mb-9 max-w-xl mx-auto">
+            Takes under a minute. No credit card, no verification — just a
+            link you can start sharing today.
+          </p>
+
           <Link href="/signup">
-            <Button size="lg" className="bg-white hover:bg-white/90 border-none px-8 py-6 text-lg rounded-full">
-              Create Your Page Now
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-9 py-6 text-base rounded-sm rotate-1 hover:rotate-0 transition-transform duration-200 active:scale-95 shadow-[3px_3px_0_0_rgb(156,139,94)]"
+            >
+              Create Your Page
             </Button>
           </Link>
         </div>
@@ -33,4 +95,4 @@ const CTA = () => {
   );
 };
 
-export default CTA
+export default CTA;

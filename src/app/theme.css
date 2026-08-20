@@ -1,0 +1,97 @@
+/**
+ * THEME CONFIGURATION – Anonymous Feedback App
+ * Darker Green Theme
+ * Primary: Deep Forest / Emerald
+ */
+
+:root {
+  /* ===== DARK THEME (Default) ===== */
+  /* Background & Text */
+  --background: #0D1210;
+  --foreground: #E6EDE8;
+
+  /* Cards */
+  --card: #151C18;
+  --card-foreground: #E6EDE8;
+
+  /* Popovers */
+  --popover: #151C18;
+  --popover-foreground: #E6EDE8;
+
+  /* Primary – Darker Emerald */
+  --primary: #16A34A;
+  --primary-foreground: #F0FDF4;
+
+  /* Secondary */
+  --secondary: #1A2420;
+  --secondary-foreground: #E6EDE8;
+
+  /* Muted */
+  --muted: #1F2A25;
+  --muted-foreground: #9CA8A1;
+
+  /* Accent – Soft Green */
+  --accent: #22C55E;
+  --accent-foreground: #0D1210;
+
+  /* Destructive */
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+
+  /* Border & Input */
+  --border: #2A3830;
+  --input: #1A2420;
+  --ring: #16A34A;
+
+  /* Chart Colors */
+  --chart-1: #16A34A;
+  --chart-2: #22C55E;
+  --chart-3: #4ADE80;
+  --chart-4: #86EFAC;
+  --chart-5: #BBF7D0;
+
+  /* Radius */
+  --radius: 0.625rem;
+}
+
+/* Light Theme */
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #F4F9F5;
+    --foreground: #0F1A13;
+
+    --card: #FFFFFF;
+    --card-foreground: #0F1A13;
+
+    --popover: #FFFFFF;
+    --popover-foreground: #0F1A13;
+
+    --primary: #15803D;
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #E8F0EA;
+    --secondary-foreground: #0F1A13;
+
+    --muted: #DCE8E0;
+    --muted-foreground: #4B6455;
+
+    --accent: #16A34A;
+    --accent-foreground: #FFFFFF;
+
+    --border: #C8D9CE;
+    --input: #E8F0EA;
+    --ring: #15803D;
+  }
+}
+
+/* Sidebar Colors */
+:root {
+  --sidebar: #121A16;
+  --sidebar-foreground: #E6EDE8;
+  --sidebar-primary: #16A34A;
+  --sidebar-primary-foreground: #F0FDF4;
+  --sidebar-accent: #22C55E;
+  --sidebar-accent-foreground: #0D1210;
+  --sidebar-border: #2A3830;
+  --sidebar-ring: #16A34A;
+}

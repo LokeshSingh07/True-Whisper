@@ -1,7 +1,6 @@
 'use client'
 import MessageCard from '@/components/MessageCard';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Message } from '@/model/User';
 import { acceptMessageSchema } from '@/schemas/acceptMessageSchema';
@@ -141,7 +140,9 @@ const Dashboard = () => {
 
   if(!session || !session.user){
     return (
-      <p>No content found</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="font-mono text-sm text-muted-foreground">No content found</p>
+      </div>
     )
   }
 
@@ -155,97 +156,125 @@ const Dashboard = () => {
 
 
   return (
-    <div className='my-8 px-4 lg:mx-auto rounded w-full max-w-6xl'>
-      {/* <h1 className='text-4xl font-bold mb-4'>User Dashboard</h1> */}
-      
-      <div className='w-full mb-6'>
-        <h2 className="text-xl font-semibold mb-2">Your Unique Message Link</h2>
-        <div className='flex items-center justify-between w-full gap-2'>
-          <input 
-            type='text'
-            value={profileUrl}
-            disabled
-            className='input input-bordered w-full'
-          />
-          <Button onClick={copyToClipboard} variant={"secondary"} size="icon" title="Copy Link"><Copy/></Button>
+    <div className="bg-background min-h-screen">
+      <div className='my-0 px-4 py-10 lg:mx-auto w-full max-w-6xl'>
+
+        <div className="mb-8">
+          <p className="font-mono text-[11px] tracking-[0.25em] text-muted-foreground uppercase mb-2">
+            Case File — {username || "Agent"}
+          </p>
+          <h1 className="text-2xl sm:text-3xl font-bold font-mono text-foreground">
+            Your Inbox
+          </h1>
         </div>
-        <p className="text-sm text-muted-foreground mt-1">
-          Share this link with others so they can send you anonymous messages.
-        </p>
+
+        {/* Drop-box link */}
+        <div className='w-full mb-8 border border-border/30 p-5 sm:p-6'>
+          <h2 className="font-mono text-xs tracking-widest uppercase text-muted-foreground mb-3">
+            Your Drop Box Link
+          </h2>
+          <div className='flex items-center justify-between w-full gap-2'>
+            <input
+              type='text'
+              value={profileUrl}
+              disabled
+              className='w-full bg-input border border-border/25 px-3 py-2 font-mono text-sm text-foreground rounded-sm disabled:opacity-80'
+            />
+            <Button
+              onClick={copyToClipboard}
+              size="icon"
+              title="Copy Link"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm flex-shrink-0"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground mt-2">
+            Share this link with others so they can send you anonymous messages.
+          </p>
+        </div>
+
+        {/* Accepting toggle */}
+        <div className='mb-8 flex items-center justify-between border border-border/30 px-5 py-4'>
+          <span className="text-sm text-muted-foreground">
+            Accepting messages is{" "}
+            <strong className={acceptMessage ? "text-foreground" : "text-muted-foreground"}>
+              {acceptMessage ? "enabled" : "disabled"}
+            </strong>
+          </span>
+          <Switch
+            {...register('acceptMessage')}
+            checked={acceptMessage}
+            onCheckedChange={handleSwitchChange}
+            disabled={isSwitchLoading}
+            className="data-[state=checked]:bg-primary"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
+          {/* Filter tabs */}
+          <div className='flex gap-6 font-mono text-xs tracking-widest uppercase'>
+            {(['all', 'read', 'unread'] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`pb-2 border-b-2 transition-colors ${
+                  filter === f
+                    ? 'border-primary text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          <Button
+            onClick={(e)=>{
+              e.preventDefault()
+              fetchMessages(true)
+            }}
+            variant="outline"
+            size="icon"
+            className="border-border/40 text-foreground hover:bg-foreground/5 bg-transparent rounded-sm"
+            title="Refresh"
+          >
+            {
+              loading ?
+              <Loader2 className='h-4 w-4 animate-spin'/> :
+              <RefreshCcw className='h-4 w-4'/>
+            }
+          </Button>
+        </div>
+
+        <div className="h-px bg-border/20 mb-8" />
+
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          {
+            filteredMessages.length > 0
+            ? (
+              filteredMessages.map((msg, idx)=> (
+                <MessageCard
+                  key={msg._id as string}
+                  message={msg}
+                  onMessageDelete={handleDeleteMessage}
+                  onMessageRead={handleMessageRead}
+                />
+              ))
+            ) :
+            (
+              <div className="md:col-span-2 border border-dashed border-border/30 py-16 text-center">
+                <p className="font-mono text-sm text-muted-foreground">
+                  No messages to display yet.
+                </p>
+              </div>
+            )
+          }
+        </div>
+
       </div>
-
-      <div className='mb-6 flex items-center'>
-        <Switch
-          {...register('acceptMessage')}
-          checked={acceptMessage}
-          onCheckedChange={handleSwitchChange}
-          disabled={isSwitchLoading}
-        />
-        <span className="ml-2 text-base">
-          Accepting messages is <strong>{acceptMessage ? 'enabled' : 'disabled'}</strong>
-        </span>
-      </div>
-
-      <Separator/>
-
-      <Button 
-        className='mt-4'
-        onClick={(e)=>{
-          e.preventDefault()
-          fetchMessages(true)
-        }}
-        variant={"secondary"}
-      >
-        {
-          loading ? 
-          <Loader2 className='h-4 w-4 animate-spin'/> :
-          <RefreshCcw className='h-4 w-4'/>  
-        }
-      </Button>
-
-      {/* 🆕 Filter Buttons */}
-      <div className='mt-6 flex gap-2 items-center'>
-        <Button
-          variant={filter === 'all' ? 'default' : 'secondary'}
-          onClick={() => setFilter('all')}
-        >
-          All
-        </Button>
-        <Button
-          variant={filter === 'read' ? 'default' : 'secondary'}
-          onClick={() => setFilter('read')}
-        >
-          Read
-        </Button>
-        <Button
-          variant={filter === 'unread' ? 'default' : 'secondary'}
-          onClick={() => setFilter('unread')}
-        >
-          Unread
-        </Button>
-      </div>
-
-      <div className='mt-10 grid grid-cols-1 md:grid-cols-2 gap-6'>
-        {
-          filteredMessages.length > 0 
-          ? (
-            filteredMessages.map((msg, idx)=> (
-              <MessageCard
-                key={msg._id as string}
-                message={msg}
-                onMessageDelete={handleDeleteMessage}
-                onMessageRead={handleMessageRead}
-              />
-            ))
-          ) : 
-          (
-            <p className="text-muted-foreground">No messages to display yet.</p>
-          )
-        }
-      </div>
-
     </div>
   )
 }
 
-export default Dashboard 
+export default Dashboard

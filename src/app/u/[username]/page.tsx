@@ -14,7 +14,7 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { z } from "zod"
-import { Loader2, Sparkle } from 'lucide-react';
+import { Loader2, Sparkle, EyeOff } from 'lucide-react';
 import { ApiResponse } from '@/types/ApiResponse';
 import { toast } from 'sonner';
 import axios, { AxiosError } from 'axios';
@@ -107,30 +107,51 @@ const Page = () => {
 
 
   return (
-    <div className='w-full '>
-      <div className='max-w-4xl mx-auto px-4'>     
-        <div className='min-h-[40vh]'>
-          <p className='text-center text-3xl font-bold my-10'>Send an Anonymous Message</p>
-          
-          {/* <p>Send Anonymous Message @{username}</p> */}
+    <div className='w-full bg-background min-h-screen'>
+      <div className='max-w-3xl mx-auto px-4 py-20'>
+
+        <div className='min-h-[30vh]'>
+          <div className="text-center mb-10">
+            <div className="mb-5 inline-flex items-center gap-2 border border-border/50 px-3 py-1 font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
+              <EyeOff className="h-3 w-3" />
+              Drop Box Open
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold font-mono text-foreground mb-2">
+              Send an Anonymous Message
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              To <span className="font-mono text-foreground">@{username}</span> — nothing here is traced back to you.
+            </p>
+          </div>
+
           {/* form */}
           <Form {...register}>
-            <form onSubmit={register.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={register.handleSubmit(onSubmit)} className="space-y-5">
               <FormField
                 name="content"
                 control={register.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Message to @{username}</FormLabel>
+                    <FormLabel className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+                      Your Message
+                    </FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Write your message here..." className='h-32 resize-none' {...field}/>
+                      <Textarea
+                        placeholder="Write your message here..."
+                        className='h-36 resize-none bg-card text-card-foreground placeholder:text-muted-foreground/50 border-border/30 rounded-sm font-mono focus-visible:ring-primary'
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Button type="submit" disabled={isSubmitting} >
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm px-8 py-5"
+              >
                 {
                   isSubmitting ? (
                     <>
@@ -142,13 +163,17 @@ const Page = () => {
             </form>
           </Form>
 
-
-
         </div>
 
         {/* suggest msg -> AI */}
-        <div className='flex flex-col gap-4 mt-14'>
-          <Button onClick={()=> handleSuggestMessage()} className='w-fit' disabled={isSuggestLoading}>
+        <div className='flex flex-col gap-4 mt-16'>
+          <div className="h-px bg-border/20 mb-2" />
+
+          <Button
+            onClick={()=> handleSuggestMessage()}
+            className='w-fit bg-transparent border border-border/50 text-foreground hover:bg-foreground/5 rounded-sm'
+            disabled={isSuggestLoading}
+          >
             {isSuggestLoading 
             ? (<>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -156,29 +181,30 @@ const Page = () => {
               </>
             ) 
             : (<>
-                <Sparkle/> Generate Suggestions
+                <Sparkle className="h-4 w-4 mr-2" /> Generate Suggestions
             </>)}
           </Button>
 
-          <p className='text-muted-foreground'>Select a suggested message to use it instantly</p>
+          <p className='text-sm text-muted-foreground'>Select a suggested message to use it instantly.</p>
 
-          <div className="w-full flex flex-col border p-4 rounded-md shadow-sm">
-            <p className='text-lg font-semibold mb-2'>Suggested Messages</p>
+          <div className="w-full flex flex-col border border-border/30 p-5 sm:p-6">
+            <p className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground mb-4">
+              Suggested Messages
+            </p>
 
-            <div className='w-full'>
+            <div className='w-full flex flex-col gap-3'>
               {
                 error 
-                ? ( <p className="text-red-500">{error.message}</p>) 
+                ? ( <p className="text-destructive text-sm">{error.message}</p>) 
                 : (
                   suggestions.map((message, index) => (
-                    <Button
+                    <button
                       key={index}
-                      variant="outline"
-                      className="mb-2 text-left justify-start whitespace-normal"
                       onClick={() => handleClickSuggestion(message)}
+                      className="text-left bg-card text-card-foreground p-4 text-sm leading-relaxed font-mono hover:bg-card/90 transition-colors rounded-sm"
                     >
                       {message}
-                    </Button>
+                    </button>
                   ))
                 )
               }

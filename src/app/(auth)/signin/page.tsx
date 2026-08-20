@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { Loader2, EyeOff } from "lucide-react"
 import { signinSchema } from "@/schemas/signinSchema"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
@@ -73,26 +73,42 @@ export default function Component() {
  
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-md">
+    <div className="flex justify-center items-center min-h-screen bg-background px-4">
+      <div className="w-full max-w-md p-8 sm:p-10 space-y-8 border border-border/30 relative">
+        {/* corner marks */}
+        <span className="absolute top-0 left-0 h-4 w-4 border-t-2 border-l-2 border-border" />
+        <span className="absolute top-0 right-0 h-4 w-4 border-t-2 border-r-2 border-border" />
+        <span className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2 border-border" />
+        <span className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-border" />
+
         <div className="text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
-            Welcome to TrueWhisper
+          <div className="mb-5 inline-flex items-center gap-2 border border-border/50 px-3 py-1 font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
+            <EyeOff className="h-3 w-3" />
+            Access Your File
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold font-mono text-foreground mb-3">
+            Welcome back
           </h1>
-          <p className="mb-4">Sign in to start your anonymous messages.</p>
+          <p className="text-muted-foreground text-sm">Sign in to start reading your anonymous messages.</p>
         </div>
       
 
         <Form {...register}>
-          <form onSubmit={register.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={register.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               name="identifier"
               control={register.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email or Username</FormLabel>
+                  <FormLabel className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+                    Email or Username
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your email or username" {...field}/>
+                    <Input
+                      placeholder="Enter your email or username"
+                      className="bg-input border-border/25 text-foreground placeholder:text-muted-foreground rounded-sm focus-visible:ring-primary"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -104,9 +120,16 @@ export default function Component() {
               control={register.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+                    Password
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your password" type="password" {...field}/>
+                    <Input
+                      placeholder="Enter your password"
+                      type="password"
+                      className="bg-input border-border/25 text-foreground placeholder:text-muted-foreground rounded-sm focus-visible:ring-primary"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription className="text-xs text-muted-foreground mt-1">
                     Must be at least 6 characters.
@@ -116,7 +139,11 @@ export default function Component() {
               )}
             />
 
-            <Button type="submit" disabled={isSubmitting} >
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm py-5"
+            >
               {
                 isSubmitting ? (
                   <>
@@ -128,9 +155,9 @@ export default function Component() {
           </form>
         </Form>
           
-        <p className="mt-8 text-sm text-muted-foreground text-center">
-          Don&apos;t Have an account? 
-          <Link href={"/signup"} className='w-full mx:w-auto ml-2 text-[#775AE9] hover:underline'>
+        <p className="text-sm text-muted-foreground text-center">
+          Don&apos;t have an account?
+          <Link href={"/signup"} className='ml-2 text-primary hover:text-[#2563EB] hover:underline'>
             Create one
           </Link>
         </p>

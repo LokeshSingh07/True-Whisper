@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { Loader2, EyeOff } from "lucide-react"
 
 
 
@@ -96,26 +96,39 @@ export default function Component() {
  
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-md p-8 space-y-8 rounded-lg shadow-md">
+    <div className="flex justify-center items-center min-h-screen bg-background px-4 py-12">
+      <div className="w-full max-w-md p-8 sm:p-10 space-y-8 border border-border/30 relative">
+        {/* corner marks */}
+        <span className="absolute top-0 left-0 h-4 w-4 border-t-2 border-l-2 border-border" />
+        <span className="absolute top-0 right-0 h-4 w-4 border-t-2 border-r-2 border-border" />
+        <span className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2 border-border" />
+        <span className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-border" />
+
         <div className="text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
-            Create Your Account
+          <div className="mb-5 inline-flex items-center gap-2 border border-border/50 px-3 py-1 font-mono text-[10px] tracking-[0.25em] text-muted-foreground uppercase">
+            <EyeOff className="h-3 w-3" />
+            Open A New File
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold font-mono text-foreground mb-3">
+            Create your account
           </h1>
-          <p className="mb-4">Join to start your anonymous messages.</p>
+          <p className="text-muted-foreground text-sm">Join to start receiving anonymous messages.</p>
         </div>
       
 
         <Form {...register}>
-          <form onSubmit={register.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={register.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               name="username"
               control={register.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+                    Username
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Choose a unique username" 
+                      className="bg-input border-border/25 text-foreground placeholder:text-muted-foreground rounded-sm focus-visible:ring-primary"
                       {...field}
                       onChange={(e)=> {
                         field.onChange(e)
@@ -123,10 +136,10 @@ export default function Component() {
                       }}
                     />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription className="text-xs">
                     {isCheckingUsername && debounced.length > 2
-                      ? "Checking availability..." 
-                      : usernameMessage && <span className={`${usernameMessage != "username is available" ? "text-red-500" : "text-green-500"}`}>{usernameMessage}</span>}
+                      ? <span className="text-muted-foreground">Checking availability...</span>
+                      : usernameMessage && <span className={usernameMessage != "username is available" ? "text-destructive" : "text-[#6FA96F]"}>{usernameMessage}</span>}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -138,9 +151,15 @@ export default function Component() {
               control={register.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+                    Email
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your email address" {...field}/>
+                    <Input
+                      placeholder="Enter your email address"
+                      className="bg-input border-border/25 text-foreground placeholder:text-muted-foreground rounded-sm focus-visible:ring-primary"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,16 +171,27 @@ export default function Component() {
               control={register.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+                    Password
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Create a secure password" type="password" {...field}/>
+                    <Input
+                      placeholder="Create a secure password"
+                      type="password"
+                      className="bg-input border-border/25 text-foreground placeholder:text-muted-foreground rounded-sm focus-visible:ring-primary"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" disabled={isSubmitting} >
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm py-5"
+            >
               {
                 isSubmitting ? (
                   <>
@@ -174,9 +204,9 @@ export default function Component() {
         </Form>
 
 
-        <p className="mt-8 text-sm text-muted-foreground text-center">
-          Already have an account? 
-          <Link href={"/signin"} className='w-full mx:w-auto ml-2 text-[#775AE9] hover:underline'>
+        <p className="text-sm text-muted-foreground text-center">
+          Already have an account?
+          <Link href={"/signin"} className='ml-2 text-primary hover:text-[#2563EB] hover:underline'>
             Sign in
           </Link>
         </p>
