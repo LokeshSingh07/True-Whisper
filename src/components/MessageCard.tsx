@@ -38,7 +38,7 @@ const MessageCard = ({message, onMessageDelete, onMessageRead}: MessageCardProps
             toast.info(response.data.message || "Marked as read")
             
             // update parent component state
-            onMessageRead(message._id as string)
+            onMessageDelete(String(message._id))
         }
         catch (err) {
             // @ts-ignore

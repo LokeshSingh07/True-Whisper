@@ -106,20 +106,17 @@ const Dashboard = () => {
     }
   }
   
-  const handleDeleteMessage = (messageId: string)=>{
-
-    setMessages(messages.filter((message) => message._id != messageId))
+  const handleDeleteMessage = (messageId: string) => {
+    setMessages(messages.filter((message) => String(message._id) !== messageId))
   }
 
   const handleMessageRead = (messageId: string) => {
-    // @ts-ignore
-    setMessages(prevMessages => {
-      const updated = prevMessages.map(message =>
-        message._id === messageId
-          ? { ...message, read: true }
+    setMessages((prevMessages: Message[]) => {
+      const updated = prevMessages.map((message) =>
+        String(message._id) === messageId
+          ? ({ ...message, read: true } as Message)
           : message
       );
-      // console.log("updated : ", updated);
       return updated;
     });
   };
@@ -255,7 +252,7 @@ const Dashboard = () => {
             ? (
               filteredMessages.map((msg, idx)=> (
                 <MessageCard
-                  key={msg._id as string}
+                  key={idx}
                   message={msg}
                   onMessageDelete={handleDeleteMessage}
                   onMessageRead={handleMessageRead}
