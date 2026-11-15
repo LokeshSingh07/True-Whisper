@@ -12,7 +12,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from './ui/button'
-import { Eye, X } from 'lucide-react'
+import { Check, Eye, Loader2, X } from 'lucide-react'
 import { Message } from '@/model/User'
 import axios from 'axios'
 import { ApiResponse } from '@/types/ApiResponse'
@@ -27,18 +27,21 @@ type MessageCardProps = {
 
 const MessageCard = ({message, onMessageDelete, onMessageRead}: MessageCardProps) => {
     const [isRead, setIsRead] = useState<boolean>(message.read);
+    const [isMarking, setIsMarking] = useState<boolean>(false);
+    const messageId = String(message._id)
 
 
 
     const markAsRead = async () => {
-        if (isRead) return; // already read
+        if (isRead || isMarking) return
+        setIsMarking(true)
+        setIsRead(true)
         try {
-            setIsRead(true)
             const response = await axios.patch<ApiResponse>(`/api/mark-as-read/${message._id}`)
             toast.info(response.data.message || "Marked as read")
             
             // update parent component state
-            onMessageDelete(String(message._id))
+            onMessageRead(messageId)
         }
         catch (err) {
             // @ts-ignore
@@ -53,7 +56,7 @@ const MessageCard = ({message, onMessageDelete, onMessageRead}: MessageCardProps
             const response = await axios.delete<ApiResponse>(`/api/delete-message/${message._id}`)
             toast.success(response.data.message)
             // @ts-ignore
-            onMessageDelete(message._id)
+            onMessageDelete(messageId)
         }
         catch(err){
             toast("Error in deleting message");
@@ -68,11 +71,6 @@ const MessageCard = ({message, onMessageDelete, onMessageRead}: MessageCardProps
             isRead ? "shadow-[4px_4px_0_0_rgba(0,0,0,0.25)]" : "shadow-[4px_4px_0_0_rgb(59,130,246)]"
         }`}
     >
-        {/* unread seal */}
-        {!isRead && (
-            <span className="absolute -top-2 -left-2 h-4 w-4 rounded-full bg-primary border-2 border-card-foreground" />
-        )}
-
         <div className="flex items-start justify-between gap-4 mb-4">
             <div className="flex flex-col gap-2">
                 <span className="font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
@@ -81,21 +79,9 @@ const MessageCard = ({message, onMessageDelete, onMessageRead}: MessageCardProps
                         timeStyle: 'short',
                     })}
                 </span>
-
-                {!isRead && (
-                    <Button
-                        onClick={markAsRead}
-                        variant="outline"
-                        size="sm"
-                        className="w-fit border-card-foreground/30 text-card-foreground hover:bg-card-foreground/5 bg-transparent rounded-sm text-xs"
-                    >
-                        <Eye className="w-3.5 h-3.5 mr-1.5" />
-                        Mark as Read
-                    </Button>
-                )}
             </div>
 
-            {/* Alert */}
+            {/* Alert - Delete */}
             <AlertDialog>
                 <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0 text-card-foreground/50 hover:text-primary hover:bg-primary/10 rounded-sm">
@@ -125,9 +111,41 @@ const MessageCard = ({message, onMessageDelete, onMessageRead}: MessageCardProps
             </AlertDialog>
         </div>
 
+
+        {/* Content  */}
         <p className="text-base leading-relaxed text-card-foreground/70 whitespace-pre-wrap font-mono">
             {message.content}
         </p>
+
+        {/* Mark as read */}
+        <div className="mt-5 pt-4 border-t border-dashed border-card-foreground/15 flex items-center justify-between gap-3 min-h-[3.25rem]">
+            {isRead ? (
+                <span className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-widest uppercase text-muted-foreground">
+                    <Check className="h-3.5 w-3.5" />
+                    Read
+                </span>
+            ) : (
+                <>
+                    <span className="inline-flex items-center gap-2 font-mono text-[11px] tracking-widest uppercase text-primary">
+                        <span className="h-2 w-2 rounded-full bg-primary" />
+                        Unread
+                    </span>
+                    <Button
+                        onClick={markAsRead}
+                        disabled={isMarking}
+                        size="sm"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-sm text-xs"
+                    >
+                        {isMarking ? (
+                            <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                        ) : (
+                            <Eye className="w-3.5 h-3.5 mr-1.5" />
+                        )}
+                        Mark as Read
+                    </Button>
+                </>
+            )}
+        </div>
     </div>
 
   )

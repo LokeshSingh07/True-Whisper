@@ -11,21 +11,25 @@ import { Copy, Loader2, RefreshCcw } from 'lucide-react';
 import { User } from 'next-auth';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-
-
+const POLL_INTERVAL = 15000;
 
 const Dashboard = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isSwitchLoading, setIsSwitchloading] = useState<boolean>(false);
   const [filter, setFilter] = useState<'all' | 'read' | 'unread'>('all');
-  const {data: session} = useSession();
+  const {data: session, status} = useSession();
+  const [hasLoadedOnce, setHasLoadedOnce] = useState<boolean>(false);
   const {username} = session?.user as User || "";
   const router  = useRouter();
+
+  // ids of messages we've already seen, used to detect new ones
+  const knownIdsRef = useRef<Set<string>>(new Set());
+  const isFirstLoadRef = useRef(true);
 
   // TODO: more research
   const [profileUrl, setProfileUrl] = useState("");
@@ -71,25 +75,44 @@ const Dashboard = () => {
   },[setValue])
 
 
-  const fetchMessages = useCallback(async(refresh: boolean = false)=>{
-    setLoading(true);
-    setIsSwitchloading(false);
+  // silent = background poll: no spinner, no error toasts
+  const fetchMessages = useCallback(async(refresh: boolean = false, silent: boolean = false)=>{
+    if (!silent) setLoading(true);
     try{
-      const response = await axios.get<ApiResponse>('/api/get-messages');
-      setMessages(response.data.messages || [])
+      const response = await axios.get<ApiResponse>('/api/get-messages', {
+        params: { _t: Date.now() },
+        headers: { 'Cache-Control': 'no-cache' },
+      });
+      const fetched: Message[] = response.data.messages || [];
+
+      // detect new messages (skip on the very first load)
+      const newOnes = fetched.filter((m) => !knownIdsRef.current.has(String(m._id)));
+      if (!isFirstLoadRef.current && newOnes.length > 0) {
+        toast.info(
+          newOnes.length === 1
+            ? "You have a new message"
+            : `You have ${newOnes.length} new messages`
+        );
+      }
+      knownIdsRef.current = new Set(fetched.map((m) => String(m._id)));
+      isFirstLoadRef.current = false;
+
+      setMessages(fetched);
       if(refresh){
         toast.success("Showing latest messages")
       }
     }
     catch(err){
-      const axiosError = err as AxiosError<ApiResponse>
-      toast(axiosError.response?.data.message || "Internal server error")
+      if (!silent) {
+        const axiosError = err as AxiosError<ApiResponse>
+        toast(axiosError.response?.data.message || "Internal server error")
+      }
     }
     finally{
-      setIsSwitchloading(false);
-      setLoading(false);
+      if (!silent) setLoading(false);
+      setHasLoadedOnce(true);
     }
-  },[setIsSwitchloading, setMessages])
+  },[])
 
 
   const handleSwitchChange = async()=>{
@@ -107,33 +130,62 @@ const Dashboard = () => {
   }
   
   const handleDeleteMessage = (messageId: string) => {
-    setMessages(messages.filter((message) => String(message._id) !== messageId))
+    setMessages((prev) => prev.filter((message) => String(message._id) !== messageId))
   }
 
   const handleMessageRead = (messageId: string) => {
-    setMessages((prevMessages: Message[]) => {
-      const updated = prevMessages.map((message) =>
+    setMessages((prevMessages: Message[]) =>
+      prevMessages.map((message) =>
         String(message._id) === messageId
           ? ({ ...message, read: true } as Message)
           : message
-      );
-      return updated;
-    });
+      )
+    );
   };
   
 
 
+  const isAuthed = !!session?.user;
 
+  // initial load
   useEffect(()=>{
-    if(!session || !session.user) return;
+    if(!isAuthed) return;
     
     fetchMessages();
     fetchAcceptmessage();
-  },[session, setValue, fetchAcceptmessage, fetchMessages])
+  },[isAuthed, fetchAcceptmessage, fetchMessages])
+
+
+  // auto refresh: poll while the tab is visible + refetch when tab regains focus
+  useEffect(() => {
+    if (!isAuthed) return;
+
+    const poll = () => {
+      if (document.visibilityState === 'visible') {
+        fetchMessages(false, true);
+      }
+    };
+
+    const intervalId = setInterval(poll, POLL_INTERVAL);
+    document.addEventListener('visibilitychange', poll);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', poll);
+    };
+  }, [isAuthed, fetchMessages]);
 
 
 
 
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
 
   if(!session || !session.user){
     return (
@@ -146,11 +198,12 @@ const Dashboard = () => {
   
   // Filter messages only once before mapping them
   const filteredMessages = messages.filter((msg) => {
-    if (filter === 'read') return msg.read === true;
-    if (filter === 'unread') return msg.read === false;
+    if (filter === 'read') return !!msg.read;
+    if (filter === 'unread') return !msg.read;
     return true;
   });
 
+  const unreadCount = messages.filter((m) => !m.read).length;
 
   return (
     <div className="bg-background min-h-screen">
@@ -181,7 +234,7 @@ const Dashboard = () => {
               onClick={copyToClipboard}
               size="icon"
               title="Copy Link"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm flex-shrink-0"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm shrink-0"
             >
               <Copy className="h-4 w-4" />
             </Button>
@@ -222,6 +275,11 @@ const Dashboard = () => {
                 }`}
               >
                 {f}
+                {f === 'unread' && unreadCount > 0 && (
+                  <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground">
+                    {unreadCount}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -250,9 +308,9 @@ const Dashboard = () => {
           {
             filteredMessages.length > 0
             ? (
-              filteredMessages.map((msg, idx)=> (
+              filteredMessages.map((msg)=> (
                 <MessageCard
-                  key={idx}
+                  key={String(msg._id)}
                   message={msg}
                   onMessageDelete={handleDeleteMessage}
                   onMessageRead={handleMessageRead}
@@ -261,9 +319,13 @@ const Dashboard = () => {
             ) :
             (
               <div className="md:col-span-2 border border-dashed border-border/30 py-16 text-center">
-                <p className="font-mono text-sm text-muted-foreground">
-                  No messages to display yet.
-                </p>
+                {!hasLoadedOnce ? (
+                  <Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" />
+                ) : (
+                  <p className="font-mono text-sm text-muted-foreground">
+                    No messages to display yet.
+                  </p>
+                )}
               </div>
             )
           }

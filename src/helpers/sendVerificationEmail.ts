@@ -1,40 +1,42 @@
-import { resend } from "@/lib/resend";
 import VerificationEmail from "../../emails/VerificationEmail";
 import { ApiResponse } from "@/types/ApiResponse";
-
+import { render } from "@react-email/components";
+import { getMailer } from "@/lib/nodemailer";
 
 export async function sendVerificationEmail(
     email: string,
     username: string,
     verifyCode: string
-): Promise<ApiResponse>{
+): Promise<ApiResponse> {
+    const mailer = getMailer();
 
-    try{
-        const { data, error } = await resend.emails.send({
-            from: 'no-reply@codewithlokesh.com',
+    if (!mailer.ok) {
+        return {
+            success: false,
+            message: mailer.error,
+        };
+    }
+
+    try {
+        const html = await render(VerificationEmail({ email, verifyCode }));
+
+        await mailer.transporter.sendMail({
+            from: mailer.from,
             to: email,
-            subject: 'True Whisper message | Verification code',
-            react: VerificationEmail({username, verifyCode}),
+            subject: "True Whisper message | Verification code",
+            html,
+            text: `Hi ${username}, your verification code is: ${verifyCode}`,
         });
-
-        // console.log("resend error: ", error);
-        if (error) {
-            return {
-                success: false,
-                message: "Failed to send verification email"
-            }
-        }
 
         return {
             success: true,
-            message: "Verifiation mail sent successfully"
-        }
-    }
-    catch(emailError){
+            message: "Verification mail sent successfully",
+        };
+    } catch (emailError) {
         console.error("Error sending verification Email", emailError);
         return {
             success: false,
-            message: "Internal server error, Resend"
-        }
+            message: "Failed to send verification email",
+        };
     }
 }
